@@ -8,38 +8,33 @@ import "../styles/components/tweetMachine/tweetMachine.scss";
 
 export const TweetMachine = () => {
     const [inputTweet, setInputTweet] = useState("");
-    const [running, setRunning] = useState(false);
+    const [promisesArray, setPromisesArray] = useState([new Promise((res) => res(""))]);
 
-    const handler = (tweet) => {
-        if (running) return;
-
-        const output = document.getElementById("output");
-
-        setRunning(true);
-        const interval = Math.random() * (2500 - 500) + 500;
-        setTimeout(() => {
-            if (tweet !== inputTweet) {
-                handler(inputTweet);
-            } else {
-                output.value = processTweet(inputTweet);
-                console.log("Delay: " + interval);
-                setRunning(false);
-            }
-        }, interval);
-    };
-
-    //We make sure to add both inputTweet and handler
     useEffect(() => {
-        // const input = document.getElementById("input");
-        const output = document.getElementById("output");
+        //This function is "doing more" than just processing the tweet
+        const doMore = async () => {
+            //Random sleep tim between 500ms and 2500ms
+            const interval = Math.random() * (2500 - 500) + 500;
 
-        //If the input box is populated, add the hashtag
-        if (inputTweet) {
-            handler(inputTweet);
-        } else {
-            output.value = "";
-        }
-    }, [inputTweet, handler]);
+            //This is an async timeout that resolves to the value of string after a delay of ms;
+            const sleep = (ms, string) => new Promise((res) => setTimeout(res, ms, string));
+
+            setPromisesArray([...promisesArray, sleep(interval, inputTweet)]);
+        };
+        doMore();
+    }, [inputTweet]);
+
+    useEffect(() => {
+        //grab the latest promise that has resolved
+        const outputText = async () => {
+            const fullyResolvedArray = await Promise.all(promisesArray);
+            const latestInput = fullyResolvedArray.slice(-1)[0];
+
+            const output = document.getElementById("output");
+            output.value = inputTweet ? processTweet(latestInput) : "";
+        };
+        outputText();
+    }, [promisesArray]);
 
     return (
         <div className="tweet-machine">
