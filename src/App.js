@@ -2,7 +2,7 @@
 import { TweetMachine } from "./components/tweetmachine";
 
 //Styles
-import "./App.scss";
+import "./styles/App.scss";
 
 function App() {
     return (

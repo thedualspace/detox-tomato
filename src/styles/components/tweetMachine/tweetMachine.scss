@@ -1,8 +1,29 @@
 .tweet-machine {
     .tweet-container {
         flex-direction: column;
-        margin: 0 1rem;
+        margin: 1rem 1rem;
 
-        //.input {}
+        //height: 10rem;
+
+        .title {
+            h3 {
+                padding-bottom: 0.5rem;
+                margin: 0;
+            }
+        }
+
+    }
+}
+
+@media only screen and (max-width: 48rem) {
+    .tweet-machine {
+        flex-direction: column;
+        width: 100%;
+        .tweet-container {
+
+            .title {
+                justify-content: center;
+            }
+        }
     }
 }
