@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+# Digital Detox Submission
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Configuration
 
-## Available Scripts
+Before the project can run successfully, a valid service account file for Google Cloud must be added to
+    
+    src/auth/googelAuth.json
 
-In the project directory, you can run:
+The file has the following format :
 
+    {
+        "type": "",
+        "project_id": "",
+        "private_key_id": "",
+        "private_key": "",
+        "client_email": "",
+        "client_id": "",
+        "auth_uri": "",
+        "token_uri": "",
+        "auth_provider_x509_cert_url": "",
+        "client_x509_cert_url": ""
+    }
+
+# Use 
+## **Local Environment**
+To run the project locally, run
+### `npm install`
 ### `npm start`
 
-Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## **Codesandbox**
+Open [this url](https://codesandbox.io/s/morning-haze-kwwgv?file=/src/App.js) to view it in the browser.
 
-### `npm test`
+# Discussion
+Specific details of implementation can be found in the form of inline comments, but a brief summary of some of the of the app is discussed here.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- The app begins with both empty input and output textareas. 
+- When a user types into the input text box, a debouncer is used to call changeHandler(). This allows us to wait a specified duration (in this case 300ms) before we process the input tweet. We do this to prevent excessive recomputations on a tweet as a user types into the input text box.
+ 
+- changeHandler() then performs the following :
+    - set loading to true
+    - queues the input tweet to be processed and awaits the result
+    - adds an additional random timeout and waits
+    - finally sets the value of the output texbox to equal the processed result
+    - call autoresize to resize the textarea as appropriate based on content
+    
+- When loading is true, the output textbox is given a special class and placeholder, which is used to indicate to the user that a the app is processing the tweet.
 
-### `npm run build`
+- A tweet is processed by passing to processTweet(), which does the following :
+    - detect the language of a string
+    - test against edge cases and conditionally return
+    - find the translation of "Tomato" in the detected language using google translate, and add a hashtag
+    - truncate the tweet down if required and add the hastag, ensuring the tweet including hashtag is not longer than 280 characters.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+On testing, a small collection of unit tests were included using jest, guaranteeing the performance of the scripts used to process the tweets.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Some points of interest
+1. An alternative solution I explored to the auto-growing text area (other than simply giving it very large proportions) involved using a `<div/>` with `role="textarea"` and `contenteditable`. However I was not confident that the accessibility of this solution was satisfactory, so I opted for a js based solution instead. 
+2. `@google-cloud/translate` has exceptionally well written docs, and they were in this case totally insufficient. Unfortunately after some time debugging, I discovered support for web clients is "limited" at this time, and in my experience the same is true for the usefulness of the errors google-cloud provides. However by exploring some packages on npm that provided react-based translation, I was able to find a workaround, which was used to get the translation working without setting up a node server. In essence it came down to how the credentials are passed to google-cloud's Translate class, and as always when using a tool for the first time, this fix was frustratingly simple.
+3. Before settling on debouncing, I tried a promise based solution to ensure the latest input always got processed last, despite the random timer duration. This worked, but ultimately was a little overengineered, and so after some more reading I found the more readable, more efficient solution used currently.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Feedback
+Thank you for this well thought out exercise, I reflected on how clever it was more than once throughout my implementation. 
